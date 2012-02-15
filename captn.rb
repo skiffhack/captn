@@ -141,12 +141,12 @@ post "/captainships/" do
   redirect back
 end
 
-get "/from/:start/to/:end/" do
+get "/:year/from/:start/to/:end/" do
   start = params[:start]
   last  = params[:end]
 
   if valid_cweek? start and valid_cweek? last
-    render_weeks_for_range(start.to_i, last.to_i)
+    render_weeks_for_range(start.to_i, last.to_i, params[:year].to_i)
   else
     pass
   end
