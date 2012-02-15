@@ -113,13 +113,15 @@ post "/captainships/" do
   week  = params[:week].to_i
   year  = params[:year]
   year  = year.to_i unless year.nil?
-  flash = nil
+  flash = {:type => :error}
 
   if valid_cweek? week
     started_at = date_for_cweek(week, year)
 
     exists = Captainship.first(:started_at => started_at)
-    unless exists
+    if exists
+      flash[:msg] = "There is already a Captain for this week"
+    else
       Captainship.create(
         :email => authorized_email,
         :started_at => date_for_cweek(week, year)
@@ -131,11 +133,8 @@ post "/captainships/" do
     end
   end
 
-  unless flash
-    flash = {
-      :type => :error,
-      :msg  => "There was an error when trying to save this date"
-    }
+  unless flash[:msg]
+    flash[:msg] = "There was an error when trying to save this date"
   end
 
   flash[:notice] = flash
