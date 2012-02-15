@@ -1,0 +1,88 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Good Morning Captn&rsquo;</title>
+    <link rel="stylesheet" href="/css/bootstrap.css" />
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body>
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a href="<%= url('/') %>" class="brand">Captains</a>
+          <ul class="nav pull-right">
+          <% if user %>
+            <li class="logout"><a href="<%= url('/logout/') %>">Sign out</a></li>
+          <% else %>
+            <li class="login"><%= render_login_button() %></li>
+          <% end %>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="container" role="main">
+      <% if flash[:notice] %>
+        <div id="notice" class="alert alert-<%= flash[:notice][:type] %>">
+          <a class="close">×</a>
+          <%= flash[:notice][:msg] %>
+        </div>
+      <% end %>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Week #</th>
+            <th>Date</th>
+            <th>Captain</th>
+          </tr>
+        </thead>
+        <tbody>
+        <% weeks.each do |week| %>
+          <tr class="<%= get_timeline_string(week[:date]) %>">
+            <th><%= week[:date].cweek %></th>
+            <td><%= pretty_date(week[:date]) %> to <%= pretty_date(week[:date] + 4) %></td>
+            <td>
+            <% if week[:captain] %>
+              <a href="<%= week[:captain].url %>" title="View <%= week[:captain].name %>'s profile">
+                <img src="<%= week[:captain].avatar %>" width="30" height="30" />
+              </a>
+              <a href="<%= week[:captain].url %>" title="View <%= week[:captain].name %>'s profile">
+                <span class="name"><%= week[:captain].name %></span>
+              </a>
+            <% else %>
+              <% if user %>
+                <form action="<%= url('/captainships/') %>" method="post">
+                  <input type="hidden" name="week" value="<%= week[:date].cweek %>" />
+                  <input type="hidden" name="year" value="<%= week[:date].year %>" />
+                  <button class="btn btn-small primary">Volunteer</button>
+                </form>
+              <% else %>
+                <span class="empty">No captain yet</span>
+              <% end %>
+            <% end %>
+            </td>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    </div>
+    <script>
+      (function () {
+        var notice = document.getElementById('notice');
+        if (notice) {
+          function onClick(event) {
+            if (event.target.className === 'close') {
+              notice.parentNode.removeChild(notice);
+            }
+          }
+          if (notice.addEventListener) {
+            notice.addEventListener('click', onClick, false);
+          }
+          else if (notice.attachEvent) {
+            notice.attachEvent('onclick', onClick);
+          }
+        }
+      })();
+    </script>
+  </body>
+</html>
