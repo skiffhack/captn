@@ -47,9 +47,15 @@ helpers do
   end
 
   def lookup_user(email)
+    @cache = {} unless @cache
     hash = md5_email(email)
-    request = HTTParty.get("http://who.theskiff.org/profiles/#{hash}.json")
-    JSON.parse(request.body)
+    user = @cache[hash]
+
+    unless user
+      request = HTTParty.get("http://who.theskiff.org/profiles/#{hash}.json")
+      user = JSON.parse(request.body)
+    end
+    user
   end
 
   def valid_cweek?(cweek)
