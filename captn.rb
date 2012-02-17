@@ -13,9 +13,9 @@ Sinatra.register Sinatra::Flash
 set :browserid_login_button, :blue
 set :sessions, true
 
-DB_URL = ENV["DATABASE_URL"] || File.join("sqlite3://#{Dir.pwd}", "captn.db")
+DBURL = ENV["DATABASE_URL"] || File.join("sqlite3://#{Dir.pwd}", "captn.db")
 DataMapper::Logger.new($stdout, :debug) if development?
-DataMapper.setup(:default, DB_URL)
+DataMapper.setup(:default, DBURL)
 
 class Captainship
   include DataMapper::Resource
@@ -55,8 +55,14 @@ helpers do
     user = @cache[hash]
 
     unless user
-      request = HTTParty.get("http://who.theskiff.org/profiles/#{hash}.json")
-      user = JSON.parse(request.body)
+      url = "http://who.theskiff.org/profiles/#{hash}.json"
+      begin
+        request = HTTParty.get(url, :timeout => 5)
+        user = JSON.parse(request.body)
+        @cache[hash] = user
+      rescue
+        user = {}
+      end
     end
     user
   end
