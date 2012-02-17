@@ -9,4 +9,5 @@ gem "httparty", "0.8.1"
 gem "sqlite3-ruby", "1.3.3", :group => :development
 gem "dm-sqlite-adapter", "1.2.0", :group => :development
 gem "pg", "0.12.2", :group => :deployment # Heroku Group
+gem "dm-postgres-adapter", "1.2.0", :group => :deployment
 
