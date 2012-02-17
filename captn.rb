@@ -29,7 +29,6 @@ class Captainship
 end
 
 DataMapper.finalize
-DataMapper.auto_upgrade!
 
 helpers do
   def get_timeline_string(date)
