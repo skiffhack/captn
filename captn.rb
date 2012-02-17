@@ -125,10 +125,13 @@ helpers do
   end
 
   def render_json(response)
-    mime_type :json
-    json = response.to_json
-    callback = params[:callback]
-    callback ? "#{callback}(#{json})" : json
+    content_type :json
+    body = response.to_json
+    if params[:callback]
+      content_type :js
+      body = "#{params[:callback]}(#{body})"
+    end
+    body
   end
 
   def render_json_list(items=[])
