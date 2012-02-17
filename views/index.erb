@@ -51,6 +51,14 @@
               <a href="<%= week[:captain].url %>" title="View <%= week[:captain].name %>'s profile">
                 <span class="name"><%= week[:captain].name %></span>
               </a>
+              <% if user and week[:captain].to_hash == user["hash"] %>
+                <form action="<%= url('/captainships/') %>" method="post">
+                  <input type="hidden" name="week" value="<%= week[:date].cweek %>" />
+                  <input type="hidden" name="year" value="<%= week[:date].year %>" />
+                  <input type="hidden" name="_method" value="delete" />
+                  <button class="btn btn-small btn-danger">Cancel</button>
+                </form>
+              <% end %>
             <% else %>
               <% if user %>
                 <form action="<%= url('/captainships/') %>" method="post">

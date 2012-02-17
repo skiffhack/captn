@@ -38,6 +38,7 @@
 }
 
 .table form {
+	display: inline;
 	margin-bottom: 0;
 }
 

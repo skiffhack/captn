@@ -26,6 +26,10 @@ class Captainship
   property :email,      String,   :required => true
   property :started_at, DateTime, :required => true
   property :created_at, DateTime
+
+  def to_hash
+    Digest::MD5.hexdigest(@email)
+  end
 end
 
 DataMapper.finalize
@@ -177,6 +181,8 @@ get "/captain.json" do
 end
 
 post "/captainships/" do
+  authorize!
+
   week  = params[:week].to_i
   year  = params[:year]
   year  = year.to_i unless year.nil?
@@ -205,6 +211,26 @@ post "/captainships/" do
   end
 
   flash[:notice] = notice
+  redirect back
+end
+
+delete "/captainships/" do
+  authorize!
+
+  week  = params[:week].to_i
+  year  = params[:year]
+  year  = year.to_i unless year.nil?
+
+  if valid_cweek? week
+    started_at = date_for_cweek(week, year)
+    captn = Captainship.all(:started_at => started_at, :email => authorized_email)
+    if captn and captn.destroy()
+      flash[:notice] = {
+        :type => :success,
+        :msg  => "Cancelled your captainship!"
+      }
+    end
+  end
   redirect back
 end
 
