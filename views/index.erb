@@ -52,7 +52,7 @@
                 <span class="name"><%= week[:captain].name %></span>
               </a>
               <% if user and week[:captain].to_hash == user["hash"] %>
-                <form action="<%= url('/captainships/') %>" method="post">
+                <form class="cancel" action="<%= url('/captainships/') %>" method="post">
                   <input type="hidden" name="week" value="<%= week[:date].cweek %>" />
                   <input type="hidden" name="year" value="<%= week[:date].year %>" />
                   <input type="hidden" name="_method" value="delete" />
