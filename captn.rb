@@ -116,6 +116,22 @@ get "/logout/" do
   redirect back
 end
 
+get "/captain.json" do
+  start = date_for_cweek(Date.today.cweek)
+  captain = Captainship.first(:started_at => start)
+
+  response = {:captain => nil}
+  if captain
+    response[:captain] = {
+      :week => start.iso8601,
+      :hash => md5_email(captain.email)
+    }
+  end
+
+  mime_type :json
+  response.to_json
+end
+
 post "/captainships/" do
   week  = params[:week].to_i
   year  = params[:year]
