@@ -93,7 +93,7 @@ helpers do
       captain = captains_hash[date.iso8601]
 
       week = {:date => date}
-      week[:captain] = captain if captain
+      week[:captain] = lookup_captain(captain) if captain
       weeks << week
     end
 
