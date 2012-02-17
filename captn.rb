@@ -29,6 +29,7 @@ class Captainship
 end
 
 DataMapper.finalize
+DataMapper.auto_upgrade!
 
 helpers do
   def get_timeline_string(date)
@@ -113,31 +114,31 @@ post "/captainships/" do
   week  = params[:week].to_i
   year  = params[:year]
   year  = year.to_i unless year.nil?
-  flash = {:type => :error}
+  notice = {:type => :error}
 
   if valid_cweek? week
     started_at = date_for_cweek(week, year)
 
     exists = Captainship.first(:started_at => started_at)
     if exists
-      flash[:msg] = "There is already a Captain for this week"
+      notice[:msg] = "There is already a Captain for this week"
     else
       Captainship.create(
         :email => authorized_email,
         :started_at => date_for_cweek(week, year)
       )
-      flash = {
+      notice = {
         :type => :success,
         :msg  => "Thanks for volunteering!"
       }
     end
   end
 
-  unless flash[:msg]
-    flash[:msg] = "There was an error when trying to save this date"
+  unless notice[:msg]
+    notice[:msg] = "There was an error when trying to save this date"
   end
 
-  flash[:notice] = flash
+  flash[:notice] = notice
   redirect back
 end
 
