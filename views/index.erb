@@ -32,7 +32,8 @@
         <thead>
           <tr>
             <th>Week #</th>
-            <th>Date</th>
+            <th>From</th>
+            <th>To</th>
             <th>Captain</th>
           </tr>
         </thead>
@@ -40,7 +41,8 @@
         <% weeks.each do |week| %>
           <tr class="<%= get_timeline_string(week[:date]) %>">
             <th><%= week[:date].cweek %></th>
-            <td><%= pretty_date(week[:date]) %> to <%= pretty_date(week[:date] + 4) %></td>
+            <td><%= pretty_date(week[:date]) %></td>
+            <td><%= pretty_date(week[:date] + 6) %></td>
             <td>
             <% if week[:captain] %>
               <a href="<%= week[:captain].url %>" title="View <%= week[:captain].name %>'s profile">
