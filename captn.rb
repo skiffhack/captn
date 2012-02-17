@@ -57,6 +57,14 @@ helpers do
     user
   end
 
+  def lookup_captain(captain)
+    user = lookup_user(captain.email)
+    captain.name   = user["real_name"]
+    captain.avatar = user["profile_image"]
+    captain.url    = user["html"]
+    captain
+  end
+
   def valid_cweek?(cweek)
     cweek.to_s =~ /^\d{1,2}$/ and (1..52) === cweek.to_i
   end
@@ -85,23 +93,58 @@ helpers do
       captain = captains_hash[date.iso8601]
 
       week = {:date => date}
-      if captain
-        user = lookup_user(captain.email)
-        captain.name   = user["real_name"]
-        captain.avatar = user["profile_image"]
-        captain.url    = user["html"]
-        week[:captain] = captain
-      end
+      week[:captain] = captain if captain
       weeks << week
     end
 
-    user = lookup_user(authorized_email) if authorized?
+    if accept_json?
+      render_weeks_as_json(weeks)
+    else 
+      render_weeks_as_html(weeks)
+    end
+  end
 
+  def render_weeks_as_html(weeks)
+    user = lookup_user(authorized_email) if authorized?
     erb :index, :locals => {
       :user  => user,
       :weeks => weeks,
       :render_login_button => render_login_button
     }
+  end
+
+  def render_weeks_as_json(weeks)
+    list = []
+    weeks.each do |week|
+      list << {
+        :hash => week[:captain] ? md5_email(week[:captain].email) : nil,
+        :week => week[:date].iso8601
+      }
+    end
+    render_json_list list
+  end
+
+  def render_json(response)
+    mime_type :json
+    json = response.to_json
+    callback = params[:callback]
+    callback ? "#{callback}(#{json})" : json
+  end
+
+  def render_json_list(items=[])
+    render_json({
+      :meta => {
+        :total => items.length
+      },
+      :items => items
+    })
+  end
+
+  def accept_json?
+    # This seems incredibly hacky but #accept? returns a string?
+    is_jsonp = !!(params[:callback] and request.accept?("text/javascript"))
+    is_json = request.preferred_type(%w[text/html application/json]) == "application/json"
+    is_json or is_jsonp
   end
 end
 
@@ -127,8 +170,7 @@ get "/captain.json" do
     }
   end
 
-  mime_type :json
-  response.to_json
+  render_json response
 end
 
 post "/captainships/" do
